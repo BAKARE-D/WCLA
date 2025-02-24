@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Upcoming Events</h1>
+
+{% if next_events %}
+    <ul>
+        {% for event in next_events %}
+            <li>
+                <h2>{{ event.event_name }}</h2>
+                <p><strong>Date:</strong> {{ event.event_date }}</p>
+                <p><strong>Location:</strong> {{ event.event_location }}</p>
+                <p>{{ event.event_description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No upcoming events found.</p>
+{% endif %}
+{% endblock %}

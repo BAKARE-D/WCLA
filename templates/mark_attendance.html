@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Mark Attendance for {{ event.event_name }}</h1>
+<p><strong>Date:</strong> {{ event.event_date }}</p>
+<p><strong>Location:</strong> {{ event.event_location }}</p>
+<p><strong>Description:</strong> {{ event.event_description }}</p>
+
+<form method="POST" action="/events/{{ event.id }}/mark-attendance">
+    <h2>Signups</h2>
+    {% for signup in signups %}
+        <div>
+            <input type="checkbox" name="attendance" value="{{ signup.user_id }}_{{ signup.first_name }}_{{ signup.last_name }}" {% if signup.present %}checked{% endif %}>
+            <label>{{ signup.first_name }} {{ signup.last_name }}</label>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn">Submit Attendance</button>
+</form>
+{% endblock %}

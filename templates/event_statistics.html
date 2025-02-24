@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Event Statistics</h1>
+
+<form method="POST" action="/event_statistics">
+    <label for="start_date">Start Date:</label>
+    <input type="date" name="start_date" value="{{ start_date }}">
+    <label for="end_date">End Date:</label>
+    <input type="date" name="end_date" value="{{ end_date }}">
+    <label for="specific_date">Specific Date:</label>
+    <input type="date" name="specific_date" value="{{ specific_date }}">
+    <button type="submit">Filter</button>
+</form>
+
+<h2>Summary Statistics</h2>
+<p>Total Events: {{ total_events }}</p>
+<p>Total Schools Signed Up: {{ total_schools_signed_up }}</p>
+<p>Total Schools in Database: {{ total_schools_in_db }}</p>
+<p>Total Attendees: {{ total_attendees }}</p>
+
+<h2>Event Details</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Event Name</th>
+            <th>Date</th>
+            <th>Total Attendees</th>
+            <th>Present Attendees</th>
+            <th>Presence Percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stat in event_stats %}
+            <tr>
+                <td>{{ stat.name }}</td>
+                <td>{{ stat.date }}</td>
+                <td>{{ stat.total_attendees }}</td>
+                <td>{{ stat.present_attendees }}</td>
+                <td>{{ stat.presence_percentage }}%</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

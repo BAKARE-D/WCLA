@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ event.event_name }}</h1>
+<p><strong>Date:</strong> {{ event.event_date }}</p>
+<p><strong>Location:</strong> {{ event.event_location }}</p>
+<p><strong>Description:</strong> {{ event.event_description }}</p>
+
+<h2>Signups</h2>
+{% if signups %}
+    <ul>
+        {% for signup in signups %}
+            <li>{{ signup.first_name }} {{ signup.last_name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No signups for this event yet.</p>
+{% endif %}
+
+{% endblock %}

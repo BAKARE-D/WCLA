@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>School Participation Statistics</h1>
+
+<form method="GET" action="/schools">
+    <label for="sort">Sort by:</label>
+    <select name="sort" id="sort">
+        <option value="school_name">School Name</option>
+        <option value="total_events">Total Events</option>
+        <option value="participation_percentage">Participation Percentage</option>
+    </select>
+    <button type="submit">Sort</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>School Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Total Events Signed Up</th>
+            <th>Participation Percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for school, data in participation_data %}
+            <tr>
+                <td>{{ school }}</td>
+                <td>{{ data.email }}</td>
+                <td>{{ data.phone_number }}</td>
+                <td>{{ data.total_events }}</td>
+                <td>{{ data.participation_percentage }}%</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

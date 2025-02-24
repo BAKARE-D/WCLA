@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Events</h1>
+
+{% for event in events %}
+<div class="container">
+    <div class="event-info">
+        <p><strong>{{ event.event_name }}</strong></p>
+        <p>Date: {{ event.event_date }}</p>
+        <p>Description: {{ event.event_description }}</p>
+    </div>
+    <div class="input-group">
+        <input type="text" placeholder="First Name" required>
+        <input type="text" placeholder="Last Name" required>
+    </div>
+    <button class="btn">Sign Up</button>
+</div>
+{% endfor %}
+{% endblock %}

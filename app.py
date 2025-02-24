@@ -291,7 +291,12 @@ def login():
             flash('Invalid username or password.', 'error')
             return redirect(url_for('login')), 401
 
-    return render_template('login.html')
+    user = None
+    if 'user_id' in session:
+        user_id = session.get('user_id')
+        user = User.query.get(user_id)
+
+    return render_template('login.html', user=user)
 
 @app.route('/logout')
 def logout():
@@ -495,7 +500,7 @@ def view_signups(event_id):
 
     event = Event.query.get_or_404(event_id)
     signups = Signup.query.filter_by(event_id=event_id).all()
-    return render_template('view_signups.html', event=event, signups=signups)
+    return render_template('view_signups.html', event=event, signups=signups, user=user)
 
 @app.route('/sign_up/<int:event_id>', methods=['GET', 'POST'])
 @login_required
@@ -532,7 +537,7 @@ def sign_up(event_id):
             flash('Error signing up for event. Please try again.', 'error')
             return redirect(url_for('events')), 400
 
-    return render_template('sign_up.html', event=event)
+    return render_template('sign_up.html', event=event, user=user)
 
 @app.route('/remove_signup/<int:event_id>', methods=['POST'])
 @login_required
@@ -581,7 +586,7 @@ def review_attendance(event_id):
         for attendance in attendances
     ]
 
-    return render_template('review_attendance.html', event=event, attendance=formatted_attendance)
+    return render_template('review_attendance.html', event=event, attendance=formatted_attendance, user=user)
 
 @app.route('/events/<int:event_id>/mark-attendance', methods=['GET', 'POST'])
 @login_required
@@ -637,7 +642,7 @@ def mark_attendance(event_id):
         for a in Attendance.query.filter_by(event_id=event_id).all()
     }
 
-    return render_template('mark_attendance.html', event=event, signups=signups, event_id=event_id, current_attendance=current_attendance)
+    return render_template('mark_attendance.html', event=event, signups=signups, event_id=event_id, current_attendance=current_attendance, user=user)
 
 @app.route('/event_statistics', methods=['GET', 'POST'])
 @login_required
@@ -713,8 +718,7 @@ def event_statistics():
                            total_schools_signed_up=total_schools_signed_up,
                            total_schools_in_db=total_schools_in_db,
                            total_attendees=total_attendees,
-                           school_emails=list(school_emails))
-    
+                           school_emails=list(school_emails), user=user)
 
 @app.route('/export_statistics')
 @login_required
@@ -814,8 +818,7 @@ def schools():
     else:
         sorted_data = participation_data.items()  # Default case
 
-    return render_template('schools.html', participation_data=sorted_data)
-
+    return render_template('schools.html', participation_data=sorted_data, user=user)
 
 @app.route('/export_selected_schools', methods=['POST'])
 @login_required
@@ -929,8 +932,7 @@ def event_attendance_statistics():
                            attendance_stats=attendance_stats,
                            average_attendance=average_attendance,
                            max_attendance=max_attendance,
-                           min_attendance=min_attendance)
-
+                           min_attendance=min_attendance, user=user)
 
 @app.route('/home')
 def home():
@@ -949,4 +951,4 @@ if __name__ == '__main__':
         db.drop_all()
         db.create_all()  # This creates tables in the default database (users.db)
         db.create_all(bind_key='attendance')  # This creates tables in the attendance database
-    app.run(debug=True) 
+    app.run(debug=True)
