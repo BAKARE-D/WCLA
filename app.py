@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, abort, make_response
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session as FlaskSession
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_session import Session as FlaskSession
-from authlib.integrations.flask_client import OAuth
 from functools import wraps
 from datetime import datetime, timedelta
 import os
