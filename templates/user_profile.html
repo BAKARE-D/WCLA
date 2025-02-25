@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <header>
+        <h1>User Profile for {{ user.username }}</h1>
+    </header>
+    <main>
+        <h2>Details</h2>
+        <p><strong>Name:</strong> {{ user.name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>School:</strong> {{ user.school_name }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <a href="{{ url_for('update_profile', user_id=user.id) }}">Edit Profile</a>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </main>
+{% endblock %}

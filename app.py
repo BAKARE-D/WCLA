@@ -220,6 +220,18 @@ def handle_401(e):
 def handle_403(e):
     return "Forbidden", 403
 
+# Custom decorator to check if a user is an admin
+from flask import abort
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_admin:
+            flash('You do not have permission to access this page.', 'error')
+            return redirect(url_for('dashboard'))  # Redirect to a safe page
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Routes
 @app.route('/admin_setup')
 def admin_setup():
@@ -336,12 +348,9 @@ def dashboard():
     return render_template('dashboard.html', user=user)
 
 @app.route('/user/<int:user_id>')
+@login_required
 def view_user_profile(user_id):
     """View a user's profile."""
-    if 'user_id' not in session:
-        flash('Please log in to view profiles.', 'error')
-        return redirect(url_for('login'))
-
     user = User.query.get_or_404(user_id)
     return render_template('user_profile.html', user=user)
 
@@ -964,7 +973,13 @@ def home():
 @app.route('/')
 def index():
     return redirect(url_for('home'))
-    
+
+@app.route('/admin_only_page')
+@admin_required
+def admin_only_page():
+    # Admin-only functionality here
+    return render_template('admin_page.html')
+
 if __name__ == '__main__':
     with app.app_context():
         db.drop_all()

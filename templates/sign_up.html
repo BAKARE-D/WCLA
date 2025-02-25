@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <header>
+        <h1>Sign Up for {{ event.event_name }}</h1>
+    </header>
+    <main>
+        <form method="POST">
+            <div>
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" required>
+            </div>
+            <div>
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" required>
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <a href="{{ url_for('events') }}">Back to Events</a>
+    </main>
+{% endblock %}

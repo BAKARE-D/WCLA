@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <header>
+        <h1>Attendance Review for {{ event.event_name }}</h1>
+        <p>Date: {{ event.event_date }}</p>
+        <p>Location: {{ event.event_location }}</p>
+    </header>
+    <main>
+        <h2>Attendance List</h2>
+        <ul>
+            {% for entry in attendance %}
+                <li>{{ entry }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </main>
+{% endblock %}
