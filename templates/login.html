@@ -2,17 +2,22 @@
 
 {% block content %}
 <h1>Login</h1>
-<form action="{{ url_for('login') }}" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
+{% if current_user.is_authenticated %}
+    <p>You are already logged in as {{ current_user.username }}.</p>
+    <a href="{{ url_for('logout') }}">Logout</a>
+{% else %}
+    <form action="{{ url_for('login') }}" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
 
-    <button type="submit">Login</button>
-    <a href="{{ url_for('register') }}" class="btn">Register</a>
-</form>
-<p>If you don't have an account, <a href="{{ url_for('register') }}">register here</a>.</p>
+        <button type="submit">Login</button>
+        <a href="{{ url_for('register') }}" class="btn">Register</a>
+    </form>
+    <p>If you don't have an account, <a href="{{ url_for('register') }}">register here</a>.</p>
+{% endif %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         <ul>

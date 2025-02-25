@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, abort, make_response
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 from flask_session import Session as FlaskSession
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -48,6 +49,16 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session = FlaskSession()
 Session.init_app(app)
 
+# Set up Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    print(f'Loading user with ID: {user_id}')  # Debugging statement
+    return User.query.get(user_id)
+
 # Global error handlers
 @app.errorhandler(404)
 def not_found_error(error):
@@ -68,8 +79,15 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.before_request
+def load_logged_in_user():
+    user = get_current_user()  # Retrieve the current user
+    print(f'Current user loaded: {user}')  # Debugging statement
+    print(f'Session ID: {session.get("user_id")}')  # Debugging statement
+    print(f'Current user is authenticated: {user.is_authenticated}')  # Debugging statement
+
 # Models
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
@@ -183,6 +201,12 @@ def load_signups_for_event(event_id):
     """Load signups for a specific event from the database."""
     return Signup.query.filter_by(event_id=event_id).all()
 
+def get_current_user():
+    user_id = session.get('user_id')  # Assuming you store user ID in the session
+    if user_id:
+        return User.query.get(user_id)  # Fetch the user from the database
+    return None  # Return None if no user is logged in
+
 #Error handling
 @app.errorhandler(400)
 def handle_400(e):
@@ -273,30 +297,26 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """User login."""
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        if not username or not password:
-            flash('Username and password are required.', 'error')
-            return redirect(url_for('login')), 400
-
+        username = request.form['username']
+        password = request.form['password']
+        print(f'Trying to log in user: {username}')  # Debugging statement
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            flash('Logged in successfully!', 'success')
-            return redirect(url_for('dashboard'))
+        if user:
+            print(f'User found: {user.username}')  # Debugging statement
+            if check_password_hash(user.password, password):  # Assuming you are hashing passwords
+                session['user_id'] = user.id  # Set user ID in session
+                print(f'Session set for user ID: {user.id}')  # Debugging statement
+                print(f'User is authenticated: {user.is_authenticated}')  # Debugging statement
+                flash('Login successful!', 'success')
+                return redirect(url_for('dashboard'))  # Redirect to dashboard
+            else:
+                print('Password is incorrect.')  # Debugging statement
         else:
-            flash('Invalid username or password.', 'error')
-            return redirect(url_for('login')), 401
-
-    user = None
-    if 'user_id' in session:
-        user_id = session.get('user_id')
-        user = User.query.get(user_id)
-
-    return render_template('login.html', user=user)
+            print('User not found.')  # Debugging statement
+        flash('Invalid username or password.', 'error')
+        return redirect(url_for('login'))  # Redirect back to login page
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
@@ -936,15 +956,14 @@ def event_attendance_statistics():
 
 @app.route('/home')
 def home():
-    events = load_events()  # Load events from events.json
-    upcoming_events = list(events)[:3]  # Get the next 3 events
-    has_events = len(upcoming_events) > 0  # Check if there are upcoming events
-    return render_template('home.html', events=upcoming_events, has_events=has_events)
+    user = get_current_user()  # Retrieve the current user
+    print(f'Current user: {user}')  # Debugging statement
+    upcoming_events = Event.query.filter(Event.event_date >= datetime.now()).order_by(Event.event_date).limit(3).all()  # Fetch the next 3 upcoming events
+    return render_template('home.html', user=user, events=upcoming_events)
 
-# Update the index route to redirect to the home page
 @app.route('/')
 def index():
-    return redirect(url_for('home'))  # Redirect to the home page instead of login
+    return redirect(url_for('home'))
     
 if __name__ == '__main__':
     with app.app_context():

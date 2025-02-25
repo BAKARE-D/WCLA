@@ -39,3 +39,15 @@ body {
     border-radius: 5px;
     text-decoration: none;
 }
+
+.btn-black {
+    background-color: black; /* Set background color to black */
+    color: white !important; /* Set text color to white for contrast */
+    padding: 10px 20px; /* Add some padding */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Optional: add rounded corners */
+    text-decoration: none; /* Remove underline from links */
+    display: inline-block; /* Make it behave like a button */
+    font-weight: bold; /* Make the text bold for better visibility */
+    text-align: center; /* Center the text */
+}
